@@ -1,0 +1,43 @@
+[tool.poetry]
+name = "GDGoC-Team1-SeoulFestRecommender"
+version = "0.1.0"
+description = "RAG (Retrieval-Augmented Generation) based personalized recommender."
+authors = ["example <example@example.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "3.11.*"
+# Langchain/LLM
+langchain = "0.3.1"
+langgraph = "0.2.34"
+langchain-openai = "0.2.1"
+langchain-community = "0.3.1"
+langchain-chroma = "0.1.4"
+langchain-ollama = "0.2.0"
+langchain-google-genai = "2.0.0"
+langchain-groq = "0.2.0"
+gradio = "4.44.1"
+python-dotenv = "1.0.1"
+bs4 = "0.0.2"
+wikipedia = "1.4.0"
+
+# FastAPI 웹 프레임워크 및 서버
+fastapi = "^0.104.1"
+uvicorn = {extras = ["standard"], version = "^0.23.2"}
+
+# SQLAlchemy ORM 및 PostgreSQL 드라이버 (RDB 관리용)
+sqlalchemy = "^2.0.23"
+psycopg2-binary = "^2.9.9"
+
+# Pydantic (데이터 유효성 검사 및 모델링)
+pydantic = "^2.5.3"
+pydantic-settings = "^2.2.1" # FastAPI 환경 변수 관리를 위해 추가
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+pytest = "^8.2.2" # 테스트 프레임워크 추가
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
