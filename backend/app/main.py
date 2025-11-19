@@ -48,7 +48,5 @@ def sync_seoul_events_endpoint():
         saved = sync_seoul_events()
         return {"message": "ok", "saved": saved}
     except Exception as e:
-        # 에러를 FastAPI에만 던지지 말고 로그로도 남기기
         logger.exception("Failed to sync seoul events: %s", e)
-        # 여기서 그냥 예외를 다시 던져도 되고, 에러 메시지 리턴해도 됨
         raise
