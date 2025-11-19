@@ -35,3 +35,9 @@ app.include_router(festival.router, prefix="/api/v1")
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Seoul Festival Recommender API"}
+
+# 서울시 문화행사 데이터 동기화 수동 테스트용
+@app.post("/admin/seoul-events/sync")
+def manual_sync_seoul_events(db: Session = Depends(get_db)):
+    inserted = sync_seoul_events(db)
+    return {"status": "ok", "inserted": inserted}

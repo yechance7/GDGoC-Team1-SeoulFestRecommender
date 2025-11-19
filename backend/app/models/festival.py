@@ -15,3 +15,4 @@ class FestivalResponse(FestivalCreate):
     class Config:
         # ORM 모델(Entity)과의 호환성 설정
         from_attributes = True
+
