@@ -6,6 +6,7 @@ import logging
 from app.db.init_db import init_db
 from app.api import festival
 from app.core.config import settings
+from app.services.collect_event import fetch_page, sync_seoul_events
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -35,3 +36,17 @@ app.include_router(festival.router, prefix="/api/v1")
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Seoul Festival Recommender API"}
+
+# 서울시 문화행사 데이터 동기화 수동 테스트용
+@app.get("/seoul-events")
+def get_seoul_events():
+    fetch_page(1, 2)
+
+@app.post("/sync-seoul-events")
+def sync_seoul_events_endpoint():
+    try:
+        saved = sync_seoul_events()
+        return {"message": "ok", "saved": saved}
+    except Exception as e:
+        logger.exception("Failed to sync seoul events: %s", e)
+        raise
