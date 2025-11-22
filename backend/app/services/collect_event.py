@@ -9,6 +9,7 @@ import re
 
 import requests
 from sqlalchemy.orm import Session
+from sqlalchemy import exc as sqlalchemy_exc
 
 from app.core.config import settings
 from app.db.database import SessionLocal
@@ -56,7 +57,7 @@ def parse_date_or_none(raw: Any):
     if not raw_str:
         return None
 
-    for fmt in ("%Y-%m-%d", "%Y.%m.%d", "%Y%m%d"):
+    for fmt in ("%Y-%m-%d %H:%M:%S.0", "%Y-%m-%d", "%Y.%m.%d", "%Y%m%d"):
         try:
             return datetime.strptime(raw_str, fmt).date()
         except ValueError:
@@ -140,10 +141,18 @@ def save_rows(rows: List[Dict[str, Any]], db: Session) -> int:
             logger.exception("Failed to convert row to entity: %s (row=%r)", e, row)
             continue
 
-        # 유니크 키 구성 요소가 없으면 패스
-        if not event.title or not event.start_date or not event.place:
+        # 유니크 키 구성 요소가 없으면 패스 (Null 값 필터링 로직)
+        if not event.title:
+            logger.warning("Skipped: Title is missing for row=%r", row)
+            continue
+        if not event.start_date:
+            logger.warning("Skipped: Start date is missing for row=%r", row)
+            continue
+        if not event.place:
+            logger.warning("Skipped: Place is missing for row=%r", row)
             continue
 
+        # 1. 사전 중복 검사 (비효율적이지만 기존 로직 유지)
         exists = (
             db.query(SeoulEvent)
             .filter(
@@ -156,10 +165,28 @@ def save_rows(rows: List[Dict[str, Any]], db: Session) -> int:
         if exists:
             continue
 
-        db.add(event)
-        saved += 1
+        # 2. DB에 추가 후 개별 커밋 및 IntegrityError 처리
+        try:
+            db.add(event)
+            db.commit()  # 👈 개별 커밋
+            saved += 1
+        except sqlalchemy_exc.IntegrityError as e:
+            db.rollback() # 👈 오류 발생 시 롤백 (트랜잭션 초기화)
+            
+            # UniqueViolation (중복 키 위반)은 무시하고 건너뜀
+            if "duplicate key value violates unique constraint" in str(e):
+                logger.warning("Skipped (UniqueViolation): %s", event.title)
+                continue
+            else:
+                # 다른 IntegrityError (예: NOT NULL 위반)는 다시 발생
+                logger.error("Unexpected IntegrityError for %s: %s", event.title, e)
+                raise
+        except Exception as e:
+            db.rollback()
+            logger.exception("Unexpected error during save: %s", e)
+            raise
 
-    db.commit()
+
     logger.info("Saved %d new events", saved)
     return saved
 

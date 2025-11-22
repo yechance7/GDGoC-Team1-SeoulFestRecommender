@@ -24,6 +24,7 @@ setup:
 
 # Poetry 가상 환경 쉘 활성화 (가상환경 접속)
 shell:
+	@cd backend && poetry lock
 	@echo "Poetry 가상 환경 쉘로 진입합니다. (종료하려면 'exit' 입력)"
 	@cp backend/pyproject.toml .
 	@cp backend/poetry.lock .
@@ -37,11 +38,19 @@ shell:
 
 # Docker 이미지 빌드
 build:
+	@cd backend && poetry lock
+	@cp backend/pyproject.toml .
+	@cp backend/poetry.lock .	
 	docker-compose build
+	@rm pyproject.toml
+	@rm poetry.lock
+	@echo "✅ Docker 이미지 빌드 성공."
 
 # 통합 서비스 실행 (DB, Backend)
 run:
 	docker-compose up --build -d
+	# sudo lsof -i :5432
+	# sudo kill -9 
 
 # Docker 서버 중지
 stop:

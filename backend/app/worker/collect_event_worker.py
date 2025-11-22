@@ -28,4 +28,4 @@ def collect_seoul_events_worker():
 
 
 if __name__ == "__main__":
-    run_forever()
+    collect_seoul_events_worker()
