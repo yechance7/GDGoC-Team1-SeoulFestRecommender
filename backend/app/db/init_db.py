@@ -1,6 +1,7 @@
 # backend/app/db/init_db.py
 from app.db.database import engine, Base, SessionLocal
 from app.entity.festival_entity import Festival
+from app.entity.user_entity import User  # User 엔티티 임포트
 
 def init_db():
     # 1. 모든 테이블 생성 (Base에 등록된 모든 entity/model)

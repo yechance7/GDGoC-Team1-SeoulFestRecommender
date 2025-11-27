@@ -29,18 +29,18 @@ def read_festivals(
 
 @router.post("/", response_model=FestivalResponse, status_code=status.HTTP_201_CREATED)
 def create_festival(
-    festival: FestivalCreate, 
+    festival: FestivalCreate,
     repo: FestivalRepository = Depends(get_festival_repo)
 ):
     """
-    새로운 축제 정보 등록
+    새로운 이벤트 정보 등록
     """
     # 중복 검사 (선택 사항)
-    existing_festival = repo.find_by_name(festival.name)
+    existing_festival = repo.find_by_title(festival.title)
     if existing_festival:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Festival with this name already exists"
+            detail="Event with this title already exists"
         )
-        
+
     return repo.create(festival.model_dump())

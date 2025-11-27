@@ -9,8 +9,13 @@ class Settings(BaseSettings):
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
 
+    # JWT Authentication Settings
+    JWT_SECRET_KEY: str  
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24시간
+
     # Seoul Cultural Event API
-    SEOUL_EVENT_BASE_URL: str 
+    SEOUL_EVENT_BASE_URL: str
     SEOUL_EVENT_API_KEY: str   # 인증키
     SEOUL_EVENT_SERVICE: str = "culturalEventInfo"
     SEOUL_EVENT_TYPE: str = "json"
