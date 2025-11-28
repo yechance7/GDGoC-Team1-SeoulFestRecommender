@@ -1,40 +1,38 @@
 # backend/app/models/festival.py
 from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import date
+from datetime import datetime
 
-# API 요청 시 (새 이벤트 생성)
+# API 요청 시 (새 축제 생성)
 class FestivalCreate(BaseModel):
-    title: str = Field(..., example="서울 재즈 페스티벌")
-    codename: Optional[str] = Field(None, example="문화행사")
-    gu_name: Optional[str] = Field(None, example="송파구")
-    date_text: Optional[str] = Field(None, example="2025-05-24 ~ 2025-05-26")
-    place: Optional[str] = Field(None, example="올림픽공원")
-    org_name: Optional[str] = Field(None, example="서울시")
-    use_target: Optional[str] = Field(None, example="전체")
-    use_fee: Optional[str] = Field(None, example="무료")
-    inquiry: Optional[str] = Field(None, example="02-1234-5678")
-    player: Optional[str] = Field(None, example="출연자 정보")
-    program: Optional[str] = Field(None, example="프로그램 소개")
-    etc_desc: Optional[str] = Field(None, example="기타 내용")
-    org_link: Optional[str] = Field(None, example="http://example.com")
-    main_img: Optional[str] = Field(None, example="http://example.com/image.jpg")
-    rgst_date: Optional[date] = Field(None, example="2025-01-01")
-    ticket_type: Optional[str] = Field(None, example="시민")
-    start_date: Optional[date] = Field(None, example="2025-05-24")
-    end_date: Optional[date] = Field(None, example="2025-05-26")
-    theme_code: Optional[str] = Field(None, example="음악")
-    lot: Optional[float] = Field(None, example=127.123)
-    lat: Optional[float] = Field(None, example=37.456)
-    is_free: Optional[str] = Field(None, example="무료")
-    hmpg_addr: Optional[str] = Field(None, example="http://culture.go.kr")
-    pro_time: Optional[str] = Field(None, example="14:00~18:00")
+    name: str = Field(..., min_length=1, max_length=200, example="서울 재즈 페스티벌")
+    description: Optional[str] = Field(None, example="서울에서 열리는 최고의 재즈 페스티벌")
+    location: str = Field(..., min_length=1, max_length=200, example="올림픽공원, 송파구")
+    start_date: str = Field(..., pattern=r'^\d{4}-\d{2}-\d{2}$', example="2025-05-24")
+    end_date: str = Field(..., pattern=r'^\d{4}-\d{2}-\d{2}$', example="2025-05-26")
+    time: Optional[str] = Field(None, max_length=50, example="18:00 - 22:00")
+    category: str = Field(..., max_length=50, example="페스티벌")
+    price: Optional[str] = Field(None, max_length=100, example="무료")
+    image_url: Optional[str] = Field(None, max_length=500, example="https://example.com/image.jpg")
 
-# API 응답 시 (ID 포함)
+# API 응답 시 (ID 및 타임스탬프 포함)
 class FestivalResponse(FestivalCreate):
     id: int = Field(..., example=1)
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         # ORM 모델(Entity)과의 호환성 설정
         from_attributes = True
 
+# 축제 업데이트 모델 (모든 필드 선택적)
+class FestivalUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=200)
+    description: Optional[str] = None
+    location: Optional[str] = Field(None, min_length=1, max_length=200)
+    start_date: Optional[str] = Field(None, pattern=r'^\d{4}-\d{2}-\d{2}$')
+    end_date: Optional[str] = Field(None, pattern=r'^\d{4}-\d{2}-\d{2}$')
+    time: Optional[str] = Field(None, max_length=50)
+    category: Optional[str] = Field(None, max_length=50)
+    price: Optional[str] = Field(None, max_length=100)
+    image_url: Optional[str] = Field(None, max_length=500)

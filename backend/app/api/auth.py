@@ -1,12 +1,15 @@
 # backend/app/api/auth.py
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+from typing import List
 import logging
 from app.models.user import UserCreate, UserLogin, UserResponse, Token
+from app.models.seoul_event import SeoulEventResponse
 from app.repository.user_repo import UserRepository
 from app.core.security import get_password_hash, verify_password, create_access_token
 from app.core.dependencies import get_db, get_current_user
 from app.entity.user_entity import User
+from app.repository.seoul_event_like_repo import SeoulEventLikeRepository
 
 router = APIRouter(tags=["Authentication"])
 
@@ -131,3 +134,29 @@ def get_current_user_info(current_user: User = Depends(get_current_user)):
     """
     logger.info(f"Current user info requested: id={current_user.id}, username={current_user.username}")
     return current_user
+
+@router.get("/me/liked-events", response_model=List[SeoulEventResponse])
+def get_user_liked_events(
+    skip: int = Query(0, ge=0, description="페이징 오프셋"),
+    limit: int = Query(100, ge=1, le=500, description="페이징 리밋"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    현재 사용자가 찜한 이벤트 목록 조회
+
+    - **skip**: 페이징 오프셋
+    - **limit**: 페이징 리밋
+    - **인증 필요**: Bearer 토큰
+    """
+    logger.info(f"Fetching liked events for user {current_user.id}")
+    like_repo = SeoulEventLikeRepository(db)
+
+    liked_events = like_repo.get_user_liked_events(
+        user_id=current_user.id,
+        skip=skip,
+        limit=limit
+    )
+
+    logger.info(f"Found {len(liked_events)} liked events for user {current_user.id}")
+    return liked_events

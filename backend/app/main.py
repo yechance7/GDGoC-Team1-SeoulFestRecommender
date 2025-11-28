@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from app.db.init_db import init_db
-from app.api import festival, auth
+from app.api import seoul_event, auth
 from app.core.config import settings
 from app.services.collect_event import fetch_page, sync_seoul_events
 
@@ -31,7 +31,7 @@ app = FastAPI(
 )
 
 # 라우터 등록
-app.include_router(festival.router, prefix="/api/v1")
+app.include_router(seoul_event.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1/auth")
 
 @app.get("/")
