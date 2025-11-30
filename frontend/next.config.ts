@@ -13,6 +13,20 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  // Allow images from external sources (Seoul event images)
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
