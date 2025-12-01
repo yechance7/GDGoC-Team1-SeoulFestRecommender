@@ -26,11 +26,52 @@ def fetch_page(start: int, end: int) -> Tuple[List[Dict[str, Any]], int]:
 
     logger.info("Fetching Seoul events: %s", url)
 
-    resp = requests.get(url, timeout=10)
-    resp.raise_for_status()
-    data = resp.json()
+    try:
+        # timeout은 30초 이상으로 설정되었다고 가정
+        resp = requests.get(url, timeout=30) 
+        
+        # 1. HTTP 상태 코드 확인 (4xx/5xx 오류 처리)
+        if resp.status_code != 200:
+            logger.error(
+                f"Seoul API access failed. Status: {resp.status_code}. "
+                f"Response Content (First 200 chars): {resp.text[:200]}"
+            )
+            # 상태 코드가 오류인 경우, JSON 파싱을 시도하지 않고 예외 발생
+            resp.raise_for_status() 
 
+        # 2. JSON 파싱 시도
+        data = resp.json()
+
+    except requests.exceptions.HTTPError as e:
+        # raise_for_status()에 의해 발생한 HTTP 오류
+        logger.error("HTTP Error during fetch: %s", e)
+        raise
+        
+    except requests.exceptions.JSONDecodeError:
+        # 💡 JSON 파싱 실패 시 서버 응답 내용을 출력하여 오류 원인(키, 형식) 파악
+        logger.error(
+            f"JSON Decode Error! API Response was not JSON. Status: {resp.status_code}. "
+            f"Content (First 100 chars): {resp.text[:100]}"
+        )
+        raise
+    
+    except requests.exceptions.RequestException as e:
+        # 타임아웃, 연결 실패 등 네트워크 오류
+        logger.error("Network or Timeout error during fetch: %s", e)
+        raise
+    
+    
     root = data.get(settings.SEOUL_EVENT_SERVICE) or data.get("culturalEventInfo") or {}
+
+    # 서울시 API가 오류를 JSON 형식으로 반환하는 경우의 처리 (예: {"RESULT": {"CODE": "INFO-100", "MESSAGE": "..."}})
+    if (result := root.get("RESULT")) and result.get("CODE") not in ("INFO-000", "INFO-200"):
+        error_code = result.get("CODE")
+        error_msg = result.get("MESSAGE")
+        
+        # 💡 API 키 만료/요청 한도 등 서비스 오류에 대한 처리
+        logger.error(f"Seoul API Service Error: {error_code} - {error_msg}")
+        raise Exception(f"Seoul API Service Error: {error_code} - {error_msg}")
+
 
     rows = root.get("row") or []
     total_raw = root.get("list_total_count", len(rows))
@@ -41,7 +82,7 @@ def fetch_page(start: int, end: int) -> Tuple[List[Dict[str, Any]], int]:
         logger.warning(
             "Unexpected list_total_count=%r, fallback to len(rows)=%d",
             total_raw,
-            len(rows),
+            total_raw,
         )
         total = len(rows)
 

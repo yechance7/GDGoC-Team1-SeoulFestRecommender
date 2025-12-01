@@ -33,6 +33,7 @@ uvicorn = {extras = ["standard"], version = "^0.23.2"}
 # SQLAlchemy ORM 및 PostgreSQL 드라이버 (RDB 관리용)
 sqlalchemy = "^2.0.23"
 psycopg2-binary = "^2.9.9"
+pgvector = "~0.2.5"
 
 # Pydantic (데이터 유효성 검사 및 모델링)
 pydantic = "^2.5.3"

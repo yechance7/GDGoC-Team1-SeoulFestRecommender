@@ -4,6 +4,10 @@ from sqlalchemy import (
     UniqueConstraint
 )
 from app.db.database import Base
+from sqlalchemy.orm import Mapped, mapped_column
+from pgvector.sqlalchemy import Vector
+from app.core.config import settings
+EMBEDDING_DIMENSION = settings.EMBEDDING_DIMENSION
 
 class SeoulEvent(Base):
     __tablename__ = "seoul_events"
@@ -40,6 +44,21 @@ class SeoulEvent(Base):
     hmpg_addr  = Column(Text)          # 문화포털상세URL
     pro_time   = Column(String(100))   # 행사시간
 
+    embedding: Mapped[list[float]] = mapped_column(
+        Vector(EMBEDDING_DIMENSION), 
+        nullable=True,
+        doc="이벤트 제목과 내용을 결합한 텍스트의 임베딩 벡터"
+    )
+    
+    # 💡 RAG 검색을 위한 텍스트 청크 생성 메서드
+    def get_rag_chunk(self) -> str:
+        """주요 정보를 결합하여 임베딩할 텍스트를 생성합니다."""
+        return (
+            f"제목: {self.title}. "
+            f"장소: {self.place}. "
+            f"기간: {self.start_date} ~ {self.end_date}. "
+        )
+    
     __table_args__ = (
         # "새로운 데이터만 적재"를 위해 중복 기준 설정
         UniqueConstraint("title", "start_date", "place", name="uq_seoul_events_title_start_place"),

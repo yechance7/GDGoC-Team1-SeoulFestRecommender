@@ -57,8 +57,7 @@ run:
 	@echo "✅ 서버 실행 성공!"
 
 # 코드 수정 후 서버 재시작
-rebuild: stop build run
-	@echo "✅ 서버 재빌드 및 재시작 완료!"
+rebuild: stop build run 
 
 # Docker 서버 중지
 stop:

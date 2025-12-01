@@ -9,6 +9,13 @@ class Settings(BaseSettings):
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
 
+    # llm
+    SOLAR_API_KEY: str = "" 
+    SOLAR_EMBEDDING_API_URL: str
+    SOLAR_EMBEDDING_QUERY: str 
+    SOLAR_EMBEDDING_PASSAGE: str
+    EMBEDDING_DIMENSION: int
+
     # JWT Authentication Settings
     JWT_SECRET_KEY: str  
     JWT_ALGORITHM: str = "HS256"

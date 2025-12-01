@@ -5,7 +5,7 @@ version: '3.8'
 services:
   # 1. PostgreSQL Database Service
   db:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     container_name: postgres_db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -14,7 +14,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432" # 로컬에서 DB 접속 테스트용
+      - "5432:5432"
 
   # 2. FastAPI Backend Service
   backend:
@@ -25,12 +25,11 @@ services:
     env_file:
     - ./.env
     environment:
-      # FastAPI 앱이 DB에 접속하기 위해 환경 변수 전달
       DATABASE_URL: ${DATABASE_URL}
       API_HOST: ${API_HOST}
       API_PORT: ${API_PORT}
     ports:
-      - "${API_PORT}:${API_PORT}" # 8000:8000
+      - "${API_PORT}:${API_PORT}"
     depends_on:
       - db 
     volumes:
@@ -46,6 +45,7 @@ services:
       container_name: seoul_event_worker
       depends_on:
         - db
+        - backend
       env_file:
       - ./.env
       environment:
@@ -57,14 +57,38 @@ services:
         - ./logs:/app/logs
       command: sh -c "sleep 10 && poetry run python -m app.worker.collect_event_worker > /app/logs/worker.log 2>&1"
   
-  # 4. Next.js Frontend Service
+  # 4. 임베딩 벡터 생성 워커 컨테이너
+  embedding_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: embedding_worker
+    depends_on:
+      - db
+      - backend
+    env_file:
+    - ./.env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      API_HOST: ${API_HOST}
+      API_PORT: ${API_PORT}
+      SOLAR_API_KEY: ${SOLAR_API_KEY} 
+      SOLAR_EMBEDDING_PASSAGE: ${SOLAR_EMBEDDING_PASSAGE}
+      SOLAR_EMBEDDING_API_URL: ${SOLAR_EMBEDDING_API_URL}
+      EMBEDDING_DIMENSION: ${EMBEDDING_DIMENSION}
+    volumes:
+      - ./backend:/app
+      - ./logs:/app/logs
+    command: /bin/bash -c "sleep 20 && poetry run python -m app.worker.embedding_processor > /app/logs/embedding_worker.log 2>&1"
+    
+  # 5. Next.js Frontend Service
   frontend:
     build:
-      context: . # 루트 디렉토리에서 빌드 컨텍스트 시작
-      dockerfile: ./frontend/Dockerfile # 프론트엔드 Dockerfile 위치 지정
+      context: . 
+      dockerfile: ./frontend/Dockerfile
     container_name: nextjs_frontend
     ports:
-      - "3000:3000" # 로컬 포트 3000을 컨테이너 포트 3000에 연결
+      - "3000:3000"
     depends_on:
       - backend 
     volumes:
