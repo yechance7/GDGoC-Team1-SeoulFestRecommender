@@ -38,7 +38,7 @@ services:
       - ./logs:/app/logs
     command: sh -c "poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 > /app/logs/backend.log 2>&1"
 
-  # 데이터 수집 워커 컨테이너너
+  # 3. 데이터 수집 워커 컨테이너
   seoul_event_worker:
       build:
         context: ./backend
@@ -56,6 +56,21 @@ services:
         - ./backend:/app
         - ./logs:/app/logs
       command: sh -c "sleep 10 && poetry run python -m app.worker.collect_event_worker > /app/logs/worker.log 2>&1"
-
+  
+  # 4. Next.js Frontend Service
+  frontend:
+    build:
+      context: . # 루트 디렉토리에서 빌드 컨텍스트 시작
+      dockerfile: ./frontend/Dockerfile # 프론트엔드 Dockerfile 위치 지정
+    container_name: nextjs_frontend
+    ports:
+      - "3000:3000" # 로컬 포트 3000을 컨테이너 포트 3000에 연결
+    depends_on:
+      - backend 
+    volumes:
+      - ./frontend:/app/frontend:ro 
+      - /app/frontend/node_modules
+      - ./logs:/app/logs
+    command: sh -c "node_modules/.bin/next start > /app/logs/frontend.log 2>&1"
 volumes:
   postgres_data:
