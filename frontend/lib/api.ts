@@ -1,6 +1,3 @@
-// Frontend API service for connecting to the backend
-// This file contains all the API calls to the backend server
-
 // Backend API URL
 // Using direct URL to backend since the backend has CORS properly configured
 // If you want to use Next.js proxy instead, set this to empty string ''
@@ -82,7 +79,7 @@ async function apiRequest<T>(
       headers: fetchOptions.headers 
     });
     
-    const response = await fetch(url, fetchOptions);
+    const response = await fetch(fullUrl, fetchOptions);
     
     console.log(`Response status: ${response.status}`);
     
@@ -323,4 +320,3 @@ export async function getLikedSeoulEvents(token: string, skip: number = 0, limit
     }
   );
 }
-

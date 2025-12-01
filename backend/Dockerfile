@@ -16,9 +16,7 @@ RUN apt-get update && apt-get install -y \
 RUN pip install poetry
 
 # 의존성 파일 복사 및 설치
-COPY pyproject.toml /app/
-# Generate poetry.lock if it doesn't exist, then install dependencies
-RUN poetry lock --no-update || true
+COPY pyproject.toml poetry.lock /app/
 RUN poetry install --no-root --only main
 
 # 애플리케이션 코드 복사

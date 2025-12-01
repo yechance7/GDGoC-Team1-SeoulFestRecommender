@@ -37,20 +37,24 @@ export interface Category {
 export const categories: Category[] = [
   { id: "뮤지컬/오페라", name: "뮤지컬/오페라", icon: "🎭" },
   { id: "콘서트", name: "콘서트", icon: "🎵" },
+  { id: "페스티벌", name: "페스티벌", icon: "🎉" },
   { id: "전시회", name: "전시회", icon: "🎨" },
   { id: "클래식", name: "클래식", icon: "🎻" },
+  { id: "영화", name: "영화", icon: "🎥" },
   { id: "무용", name: "무용", icon: "💃" },
-  { id: "페스티벌", name: "페스티벌", icon: "🎉" },
+  { id: "교육/체험", name: "교육/체험", icon: "📚" },
   { id: "기타", name: "기타", icon: "📌" },
 ]
 
 export const categoryEmojis: Record<string, string> = {
   "뮤지컬/오페라": "🎭",
   "콘서트": "🎵",
+  "페스티벌": "🎉",
   "전시회": "🎨",
   "클래식": "🎻",
+  "영화": "🎥",
   "무용": "💃",
-  "페스티벌": "🎉",
+  "교육/체험": "📚",
   "기타": "📌",
 }
 
@@ -59,9 +63,7 @@ export const categoryEmojis: Record<string, string> = {
  * This function transforms the backend data structure into the format used by the frontend components
  */
 export function convertSeoulEventToEvent(seoulEvent: SeoulEventResponse): Event {
-  // Use program description, or fall back to etc_desc, or use a default message
-  const description = seoulEvent.program || seoulEvent.etc_desc || "행사에 대한 자세한 정보를 확인해보세요.";
-  
+  const description = seoulEvent.etc_desc || "";
   // Format location: combine place and gu_name
   const location = [seoulEvent.place, seoulEvent.gu_name].filter(Boolean).join(", ") || "장소 미정";
   

@@ -31,17 +31,19 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS 설정 - 프론트엔드에서 백엔드 API 호출을 허용
+# CORS 설정 - 프론트엔드에서 백엔드 API에 접근할 수 있도록 허용
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",
+        "http://localhost:3000",  # Next.js 기본 포트
+        "http://localhost:3001",  # 추가 포트 (필요시)
+        "http://localhost:3010",  # 사용자의 프론트엔드 포트
         "http://127.0.0.1:3000",
-        "http://localhost:3010",  # Next.js 개발 서버 (포트 3010)
+        "http://127.0.0.1:3001",
         "http://127.0.0.1:3010",
     ],
     allow_credentials=True,
-    allow_methods=["*"],  # 모든 HTTP 메서드 허용
+    allow_methods=["*"],  # 모든 HTTP 메서드 허용 (GET, POST, PUT, DELETE 등)
     allow_headers=["*"],  # 모든 헤더 허용
 )
 

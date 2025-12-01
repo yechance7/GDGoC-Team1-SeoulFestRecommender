@@ -10,10 +10,34 @@ interface EventCalendarProps {
 }
 
 export default function EventCalendar({ events, selectedDate, onSelectDate }: EventCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(new Date())
+  // Start with December 2024 where most events are
+  const [currentMonth, setCurrentMonth] = useState(new Date(2024, 11, 1)) // Month is 0-indexed, so 11 = December
 
-  const eventDates = useMemo(() => {
-    return events.map((e) => new Date(e.date).toDateString())
+  // Count events per date to show multiple event markers
+  const eventCountsByDate = useMemo(() => {
+    const countMap = new Map<string, number>()
+    
+    events.forEach((event) => {
+      // If event has start and end dates, count for all dates in between
+      if (event.startDate && event.endDate) {
+        const start = new Date(event.startDate + 'T00:00:00')
+        const end = new Date(event.endDate + 'T00:00:00')
+        
+        // Add to count for each date from start to end
+        const current = new Date(start)
+        while (current <= end) {
+          const dateString = current.toDateString()
+          countMap.set(dateString, (countMap.get(dateString) || 0) + 1)
+          current.setDate(current.getDate() + 1)
+        }
+      } else if (event.date) {
+        // Fall back to single date
+        const dateString = new Date(event.date + 'T00:00:00').toDateString()
+        countMap.set(dateString, (countMap.get(dateString) || 0) + 1)
+      }
+    })
+    
+    return countMap
   }, [events])
 
   const daysInMonth = (date: Date) => {
@@ -67,14 +91,18 @@ export default function EventCalendar({ events, selectedDate, onSelectDate }: Ev
         {days.map((day) => {
           const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
           const dateString = date.toDateString()
-          const hasEvent = eventDates.includes(dateString)
+          const eventCount = eventCountsByDate.get(dateString) || 0
+          const hasEvent = eventCount > 0
           const isSelected = selectedDate?.toDateString() === dateString
+
+          // Show up to 3 dots for events (if more than 3, still show 3 dots)
+          const dotsToShow = Math.min(eventCount, 3)
 
           return (
             <button
               key={day}
               onClick={() => onSelectDate(date)}
-              className={`aspect-square text-sm rounded-lg transition-colors font-medium ${
+              className={`aspect-square text-sm rounded-lg transition-colors font-medium relative ${
                 isSelected ? "text-white" : hasEvent ? "text-white" : "text-slate-300"
               }`}
               style={{
@@ -91,7 +119,19 @@ export default function EventCalendar({ events, selectedDate, onSelectDate }: Ev
                 }
               }}
             >
-              {day}
+              <div className="flex flex-col items-center justify-center h-full gap-0.5">
+                <span className="mb-0.5">{day}</span>
+                {hasEvent && (
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: dotsToShow }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-1 h-1 rounded-full bg-white opacity-90"
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </button>
           )
         })}

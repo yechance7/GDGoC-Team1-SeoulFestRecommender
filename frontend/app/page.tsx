@@ -122,7 +122,20 @@ export default function Home() {
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (event.location && event.location.toLowerCase().includes(searchQuery.toLowerCase()))
-    const matchesDate = !selectedDate || new Date(event.date).toDateString() === selectedDate.toDateString()
+    
+    // Check if the selected date falls within the event's date range
+    let matchesDate = true
+    if (selectedDate) {
+      if (event.startDate && event.endDate) {
+        const start = new Date(event.startDate + 'T00:00:00')
+        const end = new Date(event.endDate + 'T00:00:00')
+        const selected = new Date(selectedDate.toDateString())
+        matchesDate = selected >= start && selected <= end
+      } else {
+        const eventDate = new Date(event.date + 'T00:00:00')
+        matchesDate = eventDate.toDateString() === selectedDate.toDateString()
+      }
+    }
 
     return matchesCategory && matchesSearch && matchesDate
   })

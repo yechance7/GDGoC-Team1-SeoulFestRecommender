@@ -102,7 +102,7 @@ export default function EventList({ events, likedEvents = [], onToggleLike, isLo
                       {hasLink && (
                         <div className="mt-4 flex items-center gap-2 text-xs text-purple-400">
                           <span>🔗</span>
-                          <span>클릭하여 홈페이지 방문</span>
+                          <span>행사 홈페이지</span>
                         </div>
                       )}
                     </div>
