@@ -3,7 +3,7 @@
 # 프로젝트 빌드, 실행, DB 관리를 위한 자동화 스크립트
 # ==============================================================================
 
-.PHONY: setup shell build run stop clean
+.PHONY: setup shell build run rebuild stop clean
 
 # --------------------------
 # 1. 초기 설정 및 환경
@@ -40,17 +40,25 @@ shell:
 build:
 	@cd backend && poetry lock
 	@cp backend/pyproject.toml .
-	@cp backend/poetry.lock .
+	@cp backend/poetry.lock .	
+	@cd frontend && pnpm install
 	docker-compose build
 	@rm pyproject.toml
 	@rm poetry.lock
-	@echo "✅ Docker 이미지 빌드 성공."
+	@echo "✅ Docker 이미지 빌드 성공!"
 
-# 통합 서비스 실행 (DB, Backend)
+# 통합 서비스 실행 (DB, Backend, Worker, Frontend)
 run:
+	@mkdir -p logs
+	sudo chmod -R 777 logs
 	docker-compose up --build -d
 	# sudo lsof -i :5432
-	# sudo kill -9
+	# sudo kill -9 
+	@echo "✅ 서버 실행 성공!"
+
+# 코드 수정 후 서버 재시작
+rebuild: stop build run
+	@echo "✅ 서버 재빌드 및 재시작 완료!"
 
 # Docker 서버 중지
 stop:
@@ -59,3 +67,4 @@ stop:
 # Docker 볼륨 및 이미지 정리
 clean:
 	docker-compose down -v --rmi all
+	docker image prune -f

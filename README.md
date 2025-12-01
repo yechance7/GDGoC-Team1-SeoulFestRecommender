@@ -10,7 +10,7 @@
 ├── Makefile                                # 빌드/실행 자동화
 ├── README.md
 │
-├── backend/
+├── backend/                
 │   ├── Dockerfile                          # 백엔드 전용 이미지 빌드
 │   ├── pyproject.toml                      # Poetry 의존성
 │   ├── poetry.lock
@@ -20,8 +20,8 @@
 │       ├── main.py                         # 앱 진입점 (라우터 등록, DB 초기화)
 │       │
 │       └── api/                            # API 라우터
-│           └── festival.py
-│       ├── core/
+│           └── festival.py                 
+│       ├── core/                          
 │       │   ├── config.py                   # 환경 변수 로드
 │       │   └── dependencies.py             # DB 세션 의존성 주입
 │       │
@@ -31,19 +31,19 @@
 │       │
 │       ├── entity/                         # DB 테이블 스키마
 │       │   ├── base_entity.py
-│       │   └── festival_entity.py
+│       │   └── festival_entity.py        
 │       │
 │       ├── models/                         # Pydantic 모델 (API I/O)
-│       │   └── festival.py
+│       │   └── festival.py             
 │       │
 │       ├── repository/                     # 데이터 접근 (CRUD)
 │       │   ├── base_repo.py
 │       │   └── festival_repo.py
 │       │
 │       └── service/                        # AI
-│           └── llm_service.py
+│           └── llm_service.py    
 │
-└── frontend/                               # 프론트엔드 서비스
+└── frontend/                               # 프론트엔드 서비스 
     └── (empty)
 ```
 
@@ -64,10 +64,13 @@ make build
 # 2. Docker 서버 실행
 make run
 
-# 3. Docker 서버 중지
+# 3. 코드 수정 후 서버 재시작
+make rebuild
+
+# 4. Docker 서버 중지
 make stop
 
-# 4. Docker 볼륨 및 이미지 정리
+# 5. Docker 볼륨 및 이미지 정리
 make clean
 
 ```

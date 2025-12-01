@@ -11,7 +11,7 @@ interface EventCalendarProps {
 
 export default function EventCalendar({ events, selectedDate, onSelectDate }: EventCalendarProps) {
   // Start with December 2024 where most events are
-  const [currentMonth, setCurrentMonth] = useState(new Date(2024, 11, 1)) // Month is 0-indexed, so 11 = December
+  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 11, 1)) // Month is 0-indexed, so 11 = December
 
   // Count events per date to show multiple event markers
   const eventCountsByDate = useMemo(() => {

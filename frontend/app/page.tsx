@@ -32,7 +32,7 @@ export default function Home() {
         setError(null)
         
         // Fetch events from backend with a reasonable limit
-        const seoulEvents = await getSeoulEvents({ limit: 500 })
+        const seoulEvents = await getSeoulEvents({ limit: 10000 })
         
         // Convert backend data to frontend format
         const convertedEvents = convertSeoulEventsToEvents(seoulEvents)
