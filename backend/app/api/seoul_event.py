@@ -27,7 +27,7 @@ def get_seoul_event_like_repo(db: Session = Depends(get_db)) -> SeoulEventLikeRe
 @router.get("/", response_model=List[SeoulEventResponse])
 def read_seoul_events(
     skip: int = Query(0, ge=0, description="페이징 오프셋"),
-    limit: int = Query(100, ge=1, le=500, description="페이징 리밋"),
+    limit: int = Query(100, ge=1, le=10000, description="페이징 리밋"),
     codename: Optional[str] = Query(None, description="분류 필터 (예: 뮤지컬/오페라, 콘서트)"),
     gu_name: Optional[str] = Query(None, description="자치구 필터 (예: 송파구, 강남구)"),
     search: Optional[str] = Query(None, description="검색어 (제목, 장소, 기관명에서 검색)"),
