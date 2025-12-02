@@ -5,6 +5,7 @@ from typing import List, Optional, Dict
 from app.entity.seoul_event_entity import SeoulEvent
 from app.repository.base_repo import BaseRepository
 import logging
+from sqlalchemy import select
 
 logger = logging.getLogger(__name__)
 
@@ -203,3 +204,21 @@ class SeoulEventRepository(BaseRepository[SeoulEvent]):
         ).order_by(SeoulEvent.start_date.asc()).offset(skip).limit(limit).all()
 
         return events
+
+    def find_events_by_date_range(self, start_date_str: Optional[str], end_date_str: Optional[str]) -> List[SeoulEvent]:
+        return self.get_events_with_filters(
+            start_date=start_date_str,
+            end_date=end_date_str    
+        )
+    
+
+    def search_similar_events(self, db: Session, query_vector: list, top_k: int = 3):
+        """
+        벡터 유사도 검색을 통해 가장 관련성 높은 이벤트 3개를 반환합니다.
+        pgvector의 l2_distance(<->) 혹은 cosine_distance(<=>) 사용 가정.
+        """
+        stmt = select(SeoulEvent).order_by(
+            SeoulEvent.embedding.l2_distance(query_vector)
+        ).limit(top_k)
+        
+        return db.execute(stmt).scalars().all()
