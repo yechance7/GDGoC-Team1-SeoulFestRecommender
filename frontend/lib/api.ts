@@ -40,6 +40,16 @@ export interface ApiError {
   detail: string;
 }
 
+export interface ChatRequest {
+  username: string;
+  message: string;
+}
+
+export interface ChatResponse {
+  reply: string;
+  related_event_ids: number[];
+}
+
 // Helper function to handle API errors
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -108,6 +118,21 @@ async function apiRequest<T>(
 }
 
 // Authentication API calls
+
+/**
+ * Send a message to the chatbot.
+ * @param data - Chat data (username, message)
+ * @returns Chatbot response (reply, related_event_ids)
+ */
+export async function chatWithBot(data: ChatRequest): Promise<ChatResponse> {
+  // Assuming your backend URL is set correctly in API_BASE_URL
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  
+  return apiRequest<ChatResponse>(`${API_BASE_URL}/api/chat`, { // Endpoint is /api/chat based on backend/app/main.py
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
 
 /**
  * Sign up a new user

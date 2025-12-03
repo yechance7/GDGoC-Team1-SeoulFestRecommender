@@ -18,32 +18,48 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Provider component that wraps the app and provides auth state
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserResponse | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  // Initialize token state from localStorage (runs once on mount in the browser)
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('access_token');
+  });
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load token from localStorage on mount
+  // On mount, if we already have a token, fetch the user data
   useEffect(() => {
-    const storedToken = localStorage.getItem('access_token');
-    if (storedToken) {
-      setToken(storedToken);
-      // Fetch user data with the stored token
-      getCurrentUser(storedToken)
-        .then((userData) => {
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const fetchUser = async () => {
+      try {
+        const userData = await getCurrentUser(token);
+        if (!isCancelled) {
           setUser(userData);
-        })
-        .catch((error) => {
-          console.error('Failed to fetch user data:', error);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+        if (!isCancelled) {
           // Clear invalid token
           localStorage.removeItem('access_token');
           setToken(null);
-        })
-        .finally(() => {
+        }
+      } finally {
+        if (!isCancelled) {
           setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
-    }
-  }, []);
+        }
+      }
+    };
+
+    fetchUser();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [token]);
 
   // Login function - saves token and fetches user data
   const login = async (newToken: string) => {

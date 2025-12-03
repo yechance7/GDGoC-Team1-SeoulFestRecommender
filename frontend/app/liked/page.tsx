@@ -26,13 +26,6 @@ export default function LikedPage() {
     }
   }, [user, router])
 
-  // Load liked events from backend
-  useEffect(() => {
-    if (user && token) {
-      fetchLikedEvents()
-    }
-  }, [user, token])
-
   const fetchLikedEvents = async () => {
     if (!token) return
 
@@ -52,6 +45,13 @@ export default function LikedPage() {
       setIsLoading(false)
     }
   }
+
+  // Load liked events from backend
+  useEffect(() => {
+    if (user && token) {
+      fetchLikedEvents()
+    }
+  }, [user, token])
 
   const handleLogout = () => {
     logout()
@@ -101,7 +101,7 @@ export default function LikedPage() {
   )
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <main className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950">
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}

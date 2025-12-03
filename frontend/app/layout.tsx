@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
+
+const notoSansKr = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "행사 캘린더",
@@ -13,16 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <link
-          rel="stylesheet"
-          as="style"
-          crossOrigin="anonymous"
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap"
-        />
-      </head>
-      <body>
+    <html lang="ko">
+      <body className={notoSansKr.className}>
         <AuthProvider>
           {children}
         </AuthProvider>

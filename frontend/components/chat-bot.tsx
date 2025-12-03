@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import type { Event } from "@/lib/events-data"
+import { useState, useRef, useEffect, type ChangeEvent, type KeyboardEvent } from "react"
+import { chatWithBot } from "@/lib/api" // 💡 Add chatWithBot
+import { useAuth } from "@/contexts/auth-context" // 💡 Import useAuth to get username
 
 interface ChatMessage {
   id: string
@@ -11,12 +12,11 @@ interface ChatMessage {
 }
 
 interface ChatBotProps {
-  events: Event[]
   onClose?: () => void
 }
 
-//check for Festivals queries
-export default function ChatBot({ events, onClose }: ChatBotProps) {
+// Update the ChatBot component signature
+export default function ChatBot({ onClose }: ChatBotProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "1",
@@ -26,9 +26,13 @@ export default function ChatBot({ events, onClose }: ChatBotProps) {
     },
   ])
   const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [isLoading, setIsLoading] = useState(false)  
 
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { user } = useAuth()
+  const username = user?.username || "guest_user" // Use real username or a default
+
+// Scroll logic
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
@@ -36,83 +40,10 @@ export default function ChatBot({ events, onClose }: ChatBotProps) {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
-
-  const generateBotResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase()
-
-    if (lowerMessage.includes("festival")) {
-      const festivals = events.filter((e) => e.category === "festival")
-      if (festivals.length > 0) {
-        return `${festivals.length} 행사를 찾았어요! 요즘 핫한 행사들은 ${festivals.map((e) => e.title).join(", ")} 정도에요!`
-      }
-      return "현재 열리는 행사가 없어요."
-    }
-
-    if (lowerMessage.includes("concert")) {
-      const concerts = events.filter((e) => e.category === "concert")
-      if (concerts.length > 0) {
-        return `${concerts.length} 공연을 찾았어요! 요즘 핫한 공연들은 ${concerts.map((e) => e.title).join(", ")} 정도에요!`
-      }
-      return "현재 열리는 공연이 없어요."
-    }
-
-    if (lowerMessage.includes("exhibition") || lowerMessage.includes("exhibit")) {
-      const exhibitions = events.filter((e) => e.category === "exhibition")
-      if (exhibitions.length > 0) {
-        return `${exhibitions.length} 전시회를 찾았어요! 요즘 핫한 전시회들은 ${exhibitions.map((e) => e.title).join(", ")} 정도에요!`
-      }
-      return "현재 열리는 전시회가 없어요."
-    }
-
-    // Check for date queries
-    if (lowerMessage.includes("today") || lowerMessage.includes("tonight")) {
-      const today = new Date().toDateString()
-      const todayEvents = events.filter((e) => new Date(e.date).toDateString() === today)
-      if (todayEvents.length > 0) {
-        return `오늘의 행사들: ${todayEvents.map((e) => e.title).join(", ")}`
-      }
-      return "오늘의 행사는 없습니다."
-    }
-
-    if (lowerMessage.includes("this week")) {
-      const thisWeek = events.filter((e) => {
-        const eventDate = new Date(e.date)
-        const now = new Date()
-        const diff = (eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-        return diff >= 0 && diff <= 7
-      })
-      if (thisWeek.length > 0) {
-        return `이번 주의 행사들: ${thisWeek.map((e) => e.title).join(", ")}`
-      }
-      return "이번 주의 행사는 없습니다."
-    }
-
-    // Check for location queries
-    if (lowerMessage.includes("gangnam") || lowerMessage.includes("myeongdong") || lowerMessage.includes("hongdae")) {
-      const locationQuery = lowerMessage.includes("gangnam")
-        ? "Gangnam"
-        : lowerMessage.includes("myeongdong")
-          ? "Myeongdong"
-          : "Hongdae"
-      const locationEvents = events.filter((e) => e.location.includes(locationQuery))
-      if (locationEvents.length > 0) {
-        return `${locationQuery} 지역의 행사들: ${locationEvents.map((e) => e.title).join(", ")}`
-      }
-      return `${locationQuery} 지역의 행사는 없습니다.`
-    }
-
-    // General response
-    const randomResponses = [
-      "행사를 찾는 것을 도와드릴 수 있어요! 행사의 카테고리, 날짜, 지역 등을 물어보세요!",
-      "관심 있는 행사의 카테고리, 날짜, 지역 등을 물어보세요!",
-      "오늘의 행사, 이번 주의 행사, 특정 지역의 행사 등을 물어보세요!",
-      "핫한 행사를 추천해드릴 수 있어요! 무엇을 도와드릴까요?",
-    ]
-    return randomResponses[Math.floor(Math.random() * randomResponses.length)]
-  }
-
+  
   const handleSend = async () => {
     if (!input.trim()) return
+    if (isLoading) return // Prevent multiple sends
 
     // Add user message
     const userMessage: ChatMessage = {
@@ -122,25 +53,47 @@ export default function ChatBot({ events, onClose }: ChatBotProps) {
       timestamp: new Date(),
     }
 
-    setMessages((prev) => [...prev, userMessage])
+    // Use the current input value before clearing
+    const messageToSend = input
+    
+    setMessages((prev: ChatMessage[]) => [...prev, userMessage])
     setInput("")
     setIsLoading(true)
 
-    // Simulate bot thinking time
-    setTimeout(() => {
-      const botResponse: ChatMessage = {
+    // 2. Call the new backend API function
+    try {
+      const apiResponse = await chatWithBot({
+        username: username, // Pass the real or default username
+        message: messageToSend,
+      })
+      
+      const botReply: string = apiResponse.reply
+    
+      // 3. Add bot message
+      const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        text: generateBotResponse(input),
+        text: botReply,
         sender: "bot",
         timestamp: new Date(),
       }
-      setMessages((prev) => [...prev, botResponse])
+      setMessages((prev: ChatMessage[]) => [...prev, botMessage])
+
+    } catch (error) {
+      console.error("Chatbot API Error:", error)
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        text: "죄송합니다. 챗봇과의 통신에 문제가 발생했습니다.",
+        sender: "bot",
+        timestamp: new Date(),
+      }
+      setMessages((prev: ChatMessage[]) => [...prev, errorMessage])
+    } finally {
       setIsLoading(false)
-    }, 500)
+    }
   }
 
   return (
-    <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden flex flex-col h-96">
+    <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden flex flex-col h-150">
       <div className="bg-slate-700 px-6 py-4 border-b border-slate-600 flex justify-between items-center">
         <h3 className="text-white font-semibold">행사 챗봇</h3>
         {onClose && (
@@ -155,7 +108,7 @@ export default function ChatBot({ events, onClose }: ChatBotProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg) => (
+        {messages.map((msg: ChatMessage) => (
           <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-xs px-4 py-2 rounded-lg ${
@@ -184,8 +137,8 @@ export default function ChatBot({ events, onClose }: ChatBotProps) {
         <input
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSend()}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+          onKeyPress={(e: KeyboardEvent<HTMLInputElement>) => e.key === "Enter" && handleSend()}
           placeholder="Ask about events..."
           className="flex-1 px-4 py-2 bg-slate-700 text-white placeholder-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
         />

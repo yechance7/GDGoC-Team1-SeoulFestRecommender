@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import type { Event } from "@/lib/events-data"
 import { categoryEmojis } from "@/lib/events-data"
 
@@ -42,20 +43,23 @@ export default function EventList({ events, likedEvents = [], onToggleLike, isLo
               key={event.id}
               onClick={() => handleEventClick(event)}
               className={`bg-slate-800 rounded-lg overflow-hidden border border-slate-700 hover:border-purple-500 transition-all ${
-                hasLink ? 'cursor-pointer hover:shadow-lg hover:shadow-purple-500/20' : 'cursor-default'
+                hasLink ? "cursor-pointer hover:shadow-lg hover:shadow-purple-500/20" : "cursor-default"
               }`}
             >
               <div className="flex items-start gap-4">
                 {/* Event Image (if available) */}
                 {event.image && (
-                  <div className="w-48 h-48 flex-shrink-0">
-                    <img
+                  <div className="w-48 h-48 shrink-0 relative">
+                    <Image
                       src={event.image}
                       alt={event.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="192px"
+                      className="object-cover rounded-md"
                       onError={(e) => {
-                        // Hide image if it fails to load
-                        e.currentTarget.style.display = 'none'
+                        // Hide image wrapper if it fails to load
+                        const parent = (e.target as HTMLElement).parentElement
+                        if (parent) parent.style.display = "none"
                       }}
                     />
                   </div>
@@ -110,10 +114,10 @@ export default function EventList({ events, likedEvents = [], onToggleLike, isLo
                     {isLoggedIn && onToggleLike && (
                       <button
                         onClick={(e) => {
-                          e.stopPropagation() // Prevent event card click
+                        e.stopPropagation() // Prevent event card click
                           onToggleLike(event.id)
                         }}
-                        className="mt-2 text-2xl hover:scale-110 transition-transform flex-shrink-0"
+                        className="mt-2 text-2xl hover:scale-110 transition-transform shrink-0"
                         title={isLiked ? "찜 취소" : "찜하기"}
                       >
                         {isLiked ? "❤️" : "🤍"}

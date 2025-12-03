@@ -58,6 +58,20 @@ export default function Home() {
     }
   }, [])
 
+  const fetchLikedEvents = async () => {
+    if (!token) return
+
+    try {
+      const seoulEvents = await getLikedSeoulEvents(token)
+      // Store just the IDs as strings to match the existing format
+      const likedIds = seoulEvents.map((e) => String(e.id))
+      setLikedEvents(likedIds)
+    } catch (err) {
+      console.error("Failed to fetch liked events:", err)
+      // Don't show error to user on main page, just log it
+    }
+  }
+
   // Load liked events from backend when user logs in
   useEffect(() => {
     if (user && token) {
@@ -65,21 +79,9 @@ export default function Home() {
     } else {
       setLikedEvents([])
     }
+    // We intentionally don't include fetchLikedEvents in deps to avoid re-creating it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, token])
-
-  const fetchLikedEvents = async () => {
-    if (!token) return
-
-    try {
-      const seoulEvents = await getLikedSeoulEvents(token)
-      // Store just the IDs as strings to match the existing format
-      const likedIds = seoulEvents.map(e => String(e.id))
-      setLikedEvents(likedIds)
-    } catch (err) {
-      console.error("Failed to fetch liked events:", err)
-      // Don't show error to user on main page, just log it
-    }
-  }
 
   const handleLogin = () => {
     setShowLoginModal(false)
@@ -141,7 +143,7 @@ export default function Home() {
   })
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <main className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950">
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -254,8 +256,8 @@ export default function Home() {
       </button>
 
       {showChat && (
-        <div className="fixed bottom-24 right-6 w-96 shadow-2xl z-50">
-          <ChatBot events={events} onClose={() => setShowChat(false)} />
+        <div className="fixed bottom-24 right-6 w-100 shadow-2xl z-50">
+          <ChatBot onClose={() => setShowChat(false)} />
         </div>
       )}
     </main>
