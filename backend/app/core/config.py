@@ -15,7 +15,6 @@ class Settings(BaseSettings):
     SOLAR_EMBEDDING_QUERY: str 
     SOLAR_EMBEDDING_PASSAGE: str
     EMBEDDING_DIMENSION: int
-    UPSTAGE_API_KEY: str = ""  # chat용 Solar-Pro 키
 
     # JWT Authentication Settings
     JWT_SECRET_KEY: str  

@@ -1,26 +1,16 @@
 # app/api/chat.py
 from fastapi import APIRouter
-from pydantic import BaseModel
+from app.models.chat import ChatRequest, ChatResponse
 
-from app.services.llm_service import generate_chat_reply, ChatResult
+from app.services.chat_service import generate_chat_reply, ChatResult
 
 router = APIRouter()
-
-
-class ChatRequest(BaseModel):
-    user_id: str
-    message: str
-
-
-class ChatResponse(BaseModel):
-    reply: str
-    related_event_ids: list[int]
 
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(payload: ChatRequest):
     result: ChatResult = await generate_chat_reply(
-        user_id=payload.user_id,
+        username=payload.username,
         message=payload.message,
     )
     return ChatResponse(

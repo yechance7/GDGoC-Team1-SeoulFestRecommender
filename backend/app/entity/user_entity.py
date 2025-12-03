@@ -1,5 +1,5 @@
 # backend/app/entity/user_entity.py
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, Integer
 from datetime import datetime
 from app.entity.base_entity import BaseEntity
 

@@ -19,6 +19,7 @@ setup:
 	/bin/bash -c "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && . $$HOME/.cargo/env"
 	@echo "✅ Rust 설치 완료."
 	@echo "✨ 1. Poetry 가상 환경 설정 및 의존성 설치 중..."
+	@cd backend && poetry lock
 	@cd backend && poetry env use 3.11 && poetry install
 	@echo "✅ poetry 설치 완료."
 
@@ -62,8 +63,11 @@ rebuild: stop build run
 # Docker 서버 중지
 stop:
 	docker-compose down
+	docker container prune -f
+	docker network prune -f
 
 # Docker 볼륨 및 이미지 정리
-clean:
-	docker-compose down -v --rmi all
-	docker image prune -f
+clean: stop
+	docker system prune -a -f
+	docker volume prune -f
+	docker-compose down -v

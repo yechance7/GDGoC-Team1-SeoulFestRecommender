@@ -5,7 +5,7 @@ from app.entity.seoul_event_entity import SeoulEvent
 from app.services.embedding_service import EmbeddingService 
 from typing import List
 
-BATCH_SIZE = 50                 # 한 번에 처리할 이벤트 개수
+BATCH_SIZE = 100                # 한 번에 처리할 이벤트 개수
 INTERVAL_SECONDS = 60 * 60 * 24 # 임베딩할 데이터가 없을 때 긴 대기 시간 (24시간)
 SLEEP_TIME = 5                  # 에러 발생 후 대기 시간 (5초)
 

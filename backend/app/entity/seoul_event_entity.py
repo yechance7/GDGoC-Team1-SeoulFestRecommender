@@ -54,9 +54,9 @@ class SeoulEvent(Base):
     def get_rag_chunk(self) -> str:
         """주요 정보를 결합하여 임베딩할 텍스트를 생성합니다."""
         return (
+            f"분류: {self.codename}."
             f"제목: {self.title}. "
             f"장소: {self.place}. "
-            f"기간: {self.start_date} ~ {self.end_date}. "
         )
     
     __table_args__ = (
