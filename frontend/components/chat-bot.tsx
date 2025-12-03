@@ -108,17 +108,22 @@ export default function ChatBot({ onClose }: ChatBotProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg: ChatMessage) => (
-          <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-            <div
-              className={`max-w-xs px-4 py-2 rounded-lg ${
-                msg.sender === "user" ? "bg-purple-500 text-white" : "bg-slate-700 text-slate-100"
-              }`}
-            >
-              <p className="text-sm">{msg.text}</p>
+        {messages.map((msg: ChatMessage) => {
+          // Replace literal "\n" in text with actual newline characters for display
+          const formattedText = msg.text.replace(/\\n/g, "\n")
+
+          return (
+            <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+              <div
+                className={`max-w-xs px-4 py-2 rounded-lg ${
+                  msg.sender === "user" ? "bg-purple-500 text-white" : "bg-slate-700 text-slate-100"
+                }`}
+              >
+                <p className="text-sm whitespace-pre-line">{formattedText}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
         {isLoading && (
           <div className="flex justify-start">
             <div className="bg-slate-700 px-4 py-2 rounded-lg">
