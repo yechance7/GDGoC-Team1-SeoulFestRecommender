@@ -1,147 +1,142 @@
-# FindFest - Your Ultimate Guide to Seoul's Festivals and Events
+# FindFest - 서울 축제 및 이벤트 종합 가이드
 
-Welcome to **FindFest**, a smart web application designed to help you discover the best festivals and cultural events happening in Seoul. With our AI-powered chatbot, you can get personalized recommendations tailored to your interests.
+**FindFest**는 서울에서 열리는 최고의 축제와 문화 행사를 발견할 수 있도록 돕는 스마트 웹 애플리케이션입니다. AI 기반 챗봇을 통해 당신의 관심사에 맞춰 개인화된 추천을 받을 수 있습니다.
 
-## 🌟 Overview
+## 🌟 개요
 
-Finding the right event in a city as vibrant as Seoul can be overwhelming. FindFest simplifies this by providing a comprehensive, up-to-date database of events, from music festivals and art exhibitions to traditional performances and local celebrations. Our intelligent chatbot assistant makes discovery fun and interactive, helping you find the perfect event based on your mood, preferences, and schedule.
+서울처럼 활기찬 도시에서 적합한 이벤트를 찾는 것은 어려울 수 있습니다. FindFest는 음악 축제, 미술 전시회부터 전통 공연 및 지역 축제에 이르기까지 포괄적이고 최신 이벤트 데이터베이스를 제공하여 이를 간소화합니다. 우리의 지능형 챗봇 도우미는 당신의 기분, 선호도 및 일정에 따라 완벽한 이벤트를 찾는 데 도움을 주어 발견의 재미와 상호 작용을 더합니다.
 
-## ✨ Features
+## ✨ 기능
 
-- **📅 Comprehensive Event Listings:** Browse a wide variety of events sourced directly from Seoul's public data portal.
-- **🤖 AI-Powered Chatbot:** Get personalized event recommendations by chatting with our intelligent assistant powered by Upstage's Solar LLM.
-- **🔍 Advanced Filtering & Search:** Easily find what you're looking for with filters for event categories, dates, and locations, plus a powerful search function.
-- **❤️ Liked Events:** Save your favorite events to a personal list for quick access later.
-- **🔐 User Authentication:** Sign up and log in to manage your liked events and receive a more personalized experience.
-- **🔄 Automatic Updates:** Our database is automatically updated every 6 hours to ensure you always have the latest event information.
+- **📅 포괄적인 이벤트 목록:** 서울시 공공 데이터 포털에서 직접 가져온 다양한 이벤트를 탐색하세요.
+- **🤖 AI 기반 챗봇:** Upstage의 Solar LLM 기반 지능형 도우미와 대화하여 개인화된 이벤트 추천을 받으세요.
+- **🔍 고급 필터링 및 검색:** 이벤트 카테고리, 날짜, 위치 필터 및 강력한 검색 기능을 통해 원하는 것을 쉽게 찾을 수 있습니다.
+- **❤️ 찜한 이벤트:** 나중에 빠르게 접근할 수 있도록 좋아하는 이벤트를 개인 목록에 저장하세요.
+- **🔐 사용자 인증:** 회원가입 및 로그인하여 찜한 이벤트를 관리하고 더욱 개인화된 경험을 받으세요.
+- **🔄 자동 업데이트:** 데이터베이스는 항상 최신 이벤트 정보를 제공하기 위해 6시간마다 자동으로 업데이트됩니다.
 
-## 🚀 Technology Stack
+## 🚀 기술 스택
 
-FindFest is built with a modern and robust technology stack:
+FindFest는 현대적이고 강력한 기술 스택으로 구축되었습니다:
 
-- **Backend:**
-  - **Framework:** FastAPI (Python)
-  - **Database:** PostgreSQL
+- **백엔드:**
+  - **프레임워크:** FastAPI (Python)
+  - **데이터베이스:** PostgreSQL
   - **ORM:** SQLAlchemy
-  - **AI & Language Models:** LangChain, Upstage Solar
-- **Frontend:**
-  - **Framework:** Next.js (React)
-  - **Language:** TypeScript
-  - **Styling:** Tailwind CSS
-- **Deployment & Infrastructure:**
-  - **Containerization:** Docker & Docker Compose
+  - **AI 및 언어 모델:** LangChain, Upstage Solar
+- **프론트엔드:**
+  - **프레임워크:** Next.js (React)
+  - **언어:** TypeScript
+  - **스타일링:** Tailwind CSS
+- **배포 및 인프라:**
+  - **컨테이너화:** Docker & Docker Compose
 
-## 🏁 Getting Started
+## 🏁 시작하기
 
-There are two ways to get FindFest running: using Docker (recommended for a quick setup) or setting up each service manually for development.
+FindFest를 로컬 머신에서 실행하는 방법은 두 가지가 있습니다: Docker 사용(빠른 설정을 위해 권장) 또는 개발을 위해 각 서비스를 수동으로 설정하는 방법입니다.
 
-### Method 1: Docker (Recommended)
+### 방법 1: Docker (권장)
 
-This is the easiest way to run the entire application. You'll need Docker and Docker Compose installed.
+이것은 전체 애플리케이션을 실행하는 가장 쉬운 방법입니다. Docker와 Docker Compose가 설치되어 있어야 합니다.
 
-1.  **Clone the repository:**
+1.  **저장소 복제:**
     ```bash
     git clone https://github.com/GDGoC-Team1/FindFest.git
     cd GDGoC-Team1-FindFest
     ```
 
-2.  **Environment Variables:**
-    The backend requires API keys and database credentials. Copy the example environment file and fill in the required values.
+2.  **환경 변수:**
+    백엔드는 API 키와 데이터베이스 자격 증명이 필요합니다. 예제 환경 파일을 복사하고 필요한 값을 채우세요.
     ```bash
     cp .env.example .env
     ```
-    You will need to edit the `.env` file with your specific credentials.
+    `.env` 파일을 특정 자격 증명으로 편집해야 합니다.
 
-3.  **Build and run the application:**
-    Use the provided `Makefile` for easy setup.
+3.  **애플리케이션 빌드 및 실행:**
+    쉬운 설정을 위해 제공된 `Makefile`을 사용하세요.
     ```bash
-    # Build the Docker images for all services
+    # 모든 서비스에 대한 Docker 이미지 빌드
     make build
 
-    # Start the application in detached mode
+    # 애플리케이션을 detached 모드로 시작
     make run
     ```
 
-4.  **Access the application:**
-    - **Frontend:** Open your browser and navigate to `http://localhost:3000`
-    - **Backend API Docs:** Access the interactive API documentation at `http://localhost:8000/docs`
+4.  **애플리케이션 접속:**
+    - **프론트엔드:** 브라우저를 열고 `http://localhost:3000`으로 이동하세요.
+    - **백엔드 API 문서:** `http://localhost:8000/docs`에서 대화형 API 문서에 접속하세요.
 
-5.  **Stopping the application:**
+5.  **애플리케이션 중지:**
     ```bash
     make stop
     ```
 
-### Method 2: Manual Local Development Setup
+### 방법 2: 수동 로컬 개발 설정
 
-This method is for developers who want to work on the frontend or backend code directly.
+이 방법은 프론트엔드 또는 백엔드 코드를 직접 작업하려는 개발자를 위한 것입니다.
 
-**Prerequisites:**
-- **Node.js** (v22 or later) and **pnpm**
-- **Python** (v3.10 or later) and **Poetry**
-- A running **PostgreSQL** database instance.
+**필수 조건:**
+- **Node.js** (v22 이상) 및 **pnpm**
+- **Python** (v3.10 이상) 및 **Poetry**
+- 실행 중인 **PostgreSQL** 데이터베이스 인스턴스.
 
 ---
 
-#### Backend (FastAPI)
+#### 백엔드 (FastAPI)
 
-1.  **Navigate to the backend directory:**
+1.  **백엔드 디렉토리로 이동:**
     ```bash
     cd backend
     ```
 
-2.  **Install Dependencies:**
-    If you don't have Poetry, install it first. Then, install the project dependencies.
+2.  **의존성 설치:**
+    Poetry가 설치되어 있지 않다면 먼저 설치하세요. 그런 다음 프로젝트 의존성을 설치하세요.
     ```bash
     pip install poetry
     poetry install
     ```
 
-3.  **Set Environment Variables:**
-    Create a `.env` file in the `backend` directory. You can copy the main `.env.example` from the root directory as a template. At a minimum, you must provide:
-    - `DATABASE_URL`: The connection string for your PostgreSQL database.
-    - `JWT_SECRET_KEY`: A secret key for signing tokens (generate a random string).
-    - `SEOUL_EVENT_API_KEY`: Your API key for the Seoul Open Data Plaza.
-    - `SOLAR_API_KEY`: Your API key for the Solar LLM.
-    - (Other variables as needed from `app/core/config.py`)
+3.  **환경 변수 설정:**
+    `backend` 디렉토리에 `.env` 파일을 생성하세요. 루트 디렉토리의 `.env.example`을 템플릿으로 복사할 수 있습니다. 최소한 다음을 제공해야 합니다:
+    - `DATABASE_URL`: PostgreSQL 데이터베이스의 연결 문자열.
+    - `JWT_SECRET_KEY`: 토큰 서명을 위한 비밀 키 (임의의 문자열 생성).
+    - `SEOUL_EVENT_API_KEY`: 서울 열린 데이터 광장의 API 키.
+    - `SOLAR_API_KEY`: Solar LLM의 API 키.
+    - (필요에 따라 `app/core/config.py`의 다른 변수들)
 
-4.  **Activate Virtual Environment and Run Server:**
+4.  **가상 환경 활성화 및 서버 실행:**
     ```bash
-    # Activate the shell with the virtual environment
+    # 가상 환경 쉘 활성화
     poetry shell
 
-    # Run the FastAPI development server
+    # FastAPI 개발 서버 실행
     uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     ```
-    The backend API will be available at `http://localhost:8000`.
+    백엔드 API는 `http://localhost:8000`에서 사용할 수 있습니다.
 
 ---
 
-#### Frontend (Next.js)
+#### 프론트엔드 (Next.js)
 
-1.  **Navigate to the frontend directory:**
+1.  **프론트엔드 디렉토리로 이동:**
     ```bash
     cd frontend
     ```
 
-2.  **Install Dependencies:**
+2.  **의존성 설치:**
     ```bash
     pnpm install
     ```
 
-3.  **Run the Development Server:**
+3.  **개발 서버 실행:**
     ```bash
     pnpm dev
     ```
-    The frontend application will be available at `http://localhost:3000`.
+    프론트엔드 애플리케이션은 `http://localhost:3000`에서 사용할 수 있습니다.
 
-4.  **Connecting to the Backend:**
-    The frontend is configured to proxy API requests starting with `/api` to the backend running at `http://localhost:8000`. Ensure your backend server is running before you start the frontend.
-
-
-## 🎯 Project Goal
-
-This project was developed for the **2025 Google Developer Groups on Campus (GDGoC) oTP**. Our goal was to create an innovative and practical application that leverages the power of AI to solve a real-world problem. By combining public data with advanced language models, FindFest aims to make Seoul's rich cultural landscape more accessible and enjoyable for everyone.
+4.  **백엔드 연결:**
+    프론트엔드는 `/api`로 시작하는 API 요청을 `http://localhost:8000`에서 실행 중인 백엔드로 프록시하도록 구성되어 있습니다. 프론트엔드를 시작하기 전에 백엔드 서버가 실행 중인지 확인하세요.
 
 ---
 
-Thank you for checking out FindFest!
+FindFest에 관심을 가져주셔서 감사합니다!
