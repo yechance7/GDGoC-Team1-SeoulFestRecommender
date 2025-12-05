@@ -16,6 +16,7 @@ export default function Home() {
   const { user, token, logout } = useAuth()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [calendarMonth, setCalendarMonth] = useState(new Date(2025, 11, 1)) // December 2025
   const [searchQuery, setSearchQuery] = useState("")
   const [showChat, setShowChat] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -114,6 +115,11 @@ export default function Home() {
     }
   }
 
+  const handleMonthChange = (nextMonth: Date) => {
+    setCalendarMonth(nextMonth)
+    setSelectedDate(null)
+  }
+
   const handleNavigateLiked = () => {
     router.push("/liked")
   }
@@ -125,18 +131,22 @@ export default function Home() {
       event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (event.location && event.location.toLowerCase().includes(searchQuery.toLowerCase()))
     
-    // Check if the selected date falls within the event's date range
+    const activeYear = selectedDate ? selectedDate.getFullYear() : calendarMonth.getFullYear()
+    const activeMonth = selectedDate ? selectedDate.getMonth() : calendarMonth.getMonth()
+    const monthStart = new Date(activeYear, activeMonth, 1)
+    const monthEnd = new Date(activeYear, activeMonth + 1, 0)
+
+    const eventStart = new Date((event.startDate || event.date) + 'T00:00:00')
+    const eventEnd = new Date((event.endDate || event.startDate || event.date) + 'T00:00:00')
+
+    // Check if the selected date falls within the event's date range,
+    // otherwise only show events that overlap the visible month/year.
     let matchesDate = true
     if (selectedDate) {
-      if (event.startDate && event.endDate) {
-        const start = new Date(event.startDate + 'T00:00:00')
-        const end = new Date(event.endDate + 'T00:00:00')
-        const selected = new Date(selectedDate.toDateString())
-        matchesDate = selected >= start && selected <= end
-      } else {
-        const eventDate = new Date(event.date + 'T00:00:00')
-        matchesDate = eventDate.toDateString() === selectedDate.toDateString()
-      }
+      const selected = new Date(selectedDate.toDateString())
+      matchesDate = selected >= eventStart && selected <= eventEnd
+    } else {
+      matchesDate = eventStart <= monthEnd && eventEnd >= monthStart
     }
 
     return matchesCategory && matchesSearch && matchesDate
@@ -184,7 +194,16 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Sidebar with Calendar and Filters */}
             <div className="lg:col-span-1 space-y-6">
-              <EventCalendar events={events} selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+              <EventCalendar
+                events={events}
+                selectedDate={selectedDate}
+                onSelectDate={(date) => {
+                  setSelectedDate(date)
+                  setCalendarMonth(new Date(date.getFullYear(), date.getMonth(), 1))
+                }}
+                currentMonth={calendarMonth}
+                onMonthChange={handleMonthChange}
+              />
 
               <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
                 <h3 className="text-lg font-semibold text-white mb-4">카테고리</h3>

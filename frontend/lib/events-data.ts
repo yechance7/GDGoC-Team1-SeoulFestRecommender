@@ -80,36 +80,36 @@ export function convertSeoulEventToEvent(seoulEvent: SeoulEventResponse): Event 
     category = "전시회";
   }
   
-  // Price info from use_fee or is_free
-  const price = seoulEvent.is_free || seoulEvent.use_fee || "가격 정보 없음";
+   // Price info from use_fee or is_free
+   const price = seoulEvent.is_free || seoulEvent.use_fee || "가격 정보 없음";
   
-  return {
-    id: String(seoulEvent.id),
-    title: seoulEvent.title,
-    description: description.length > 200 ? description.substring(0, 200) + "..." : description,
-    date: date,
-    time: time,
-    location: location,
-    category: category,
-    price: price,
-    image: seoulEvent.main_img || undefined,
-    // Additional fields for detailed view
-    startDate: seoulEvent.start_date || undefined,
-    endDate: seoulEvent.end_date || undefined,
-    dateText: seoulEvent.date_text || undefined,
-    orgName: seoulEvent.org_name || undefined,
-    guName: seoulEvent.gu_name || undefined,
-    useTarget: seoulEvent.use_target || undefined,
-    inquiry: seoulEvent.inquiry || undefined,
-    player: seoulEvent.player || undefined,
-    program: seoulEvent.program || undefined,
-    orgLink: seoulEvent.org_link || undefined,
-    hmpgAddr: seoulEvent.hmpg_addr || undefined,
-    lat: seoulEvent.lat || undefined,
-    lot: seoulEvent.lot || undefined,
-  };
-}
-
+   return {
+     id: String(seoulEvent.id),
+     title: seoulEvent.title,
+     description: description.length > 200 ? description.substring(0, 200) + "..." : description,
+     date: date,
+     time: time,
+     location: location,
+     category: category,
+     price: price,
+     image: seoulEvent.main_img || undefined,
+     // Additional fields for detailed view
+     startDate: seoulEvent.start_date || undefined,
+     endDate: seoulEvent.end_date || undefined,
+     dateText: seoulEvent.date_text || undefined,
+     orgName: seoulEvent.org_name || undefined,
+     guName: seoulEvent.gu_name || undefined,
+     useTarget: seoulEvent.use_target || undefined,
+     inquiry: seoulEvent.inquiry || undefined,
+     player: seoulEvent.player || undefined,
+     program: seoulEvent.program || undefined,
+     orgLink: seoulEvent.org_link || undefined,
+     hmpgAddr: seoulEvent.hmpg_addr || undefined,
+     lat: seoulEvent.lat || undefined,
+     lot: seoulEvent.lot || undefined,
+   };
+ }
+ 
 /**
  * Convert multiple Seoul Events to Event array
  */

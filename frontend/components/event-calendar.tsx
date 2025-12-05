@@ -1,23 +1,32 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import type { Event } from "@/lib/events-data"
 
 interface EventCalendarProps {
   events: Event[]
   selectedDate: Date | null
   onSelectDate: (date: Date) => void
+  currentMonth: Date
+  onMonthChange: (nextMonth: Date) => void
 }
 
-export default function EventCalendar({ events, selectedDate, onSelectDate }: EventCalendarProps) {
-  // Start with December 2024 where most events are
-  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 11, 1)) // Month is 0-indexed, so 11 = December
-
+export default function EventCalendar({ events, selectedDate, onSelectDate, currentMonth, onMonthChange }: EventCalendarProps) {
   // Count events per date to show multiple event markers
   const eventCountsByDate = useMemo(() => {
     const countMap = new Map<string, number>()
+    const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
+    const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0)
     
     events.forEach((event) => {
+      const eventStart = new Date((event.startDate || event.date) + 'T00:00:00')
+      const eventEnd = new Date((event.endDate || event.startDate || event.date) + 'T00:00:00')
+
+      // Skip events that don't touch the visible month/year
+      if (eventStart > monthEnd || eventEnd < monthStart) {
+        return
+      }
+
       // If event has start and end dates, count for all dates in between
       if (event.startDate && event.endDate) {
         const start = new Date(event.startDate + 'T00:00:00')
@@ -38,7 +47,7 @@ export default function EventCalendar({ events, selectedDate, onSelectDate }: Ev
     })
     
     return countMap
-  }, [events])
+  }, [currentMonth, events])
 
   const daysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
@@ -52,11 +61,11 @@ export default function EventCalendar({ events, selectedDate, onSelectDate }: Ev
   const emptyDays = Array.from({ length: firstDayOfMonth(currentMonth) }, () => null)
 
   const handlePrevMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))
+    onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))
   }
 
   const handleNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))
+    onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))
   }
 
   return (
